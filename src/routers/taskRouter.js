@@ -5,33 +5,33 @@ import * as taskService from "./services/taskService.js";
 const routes = [
     {
         method: httpMethod.GET,
-        path: '/tasks',
+        url: '/tasks',
         consume: contentType.JSON,
         produce: contentType.JSON,
         handler: taskService.getTasks
     },
     {
         method: httpMethod.POST,
-        path: '/tasks',
+        url: '/tasks',
         produce: contentType.JSON,
         handler: taskService.createTask
     },
     {
         method: httpMethod.PUT,
-        path: '/tasks/:id',
+        url: '/tasks/:id',
         consume: contentType.JSON,
         produce: contentType.JSON,
         handler: taskService.updateTask
     },
     {
         method: httpMethod.DELETE,
-        path: '/tasks/:id',
+        url: '/tasks/:id',
         produce: contentType.JSON,
         handler: taskService.deleteTask
     },
     {
         method: httpMethod.PACTH,
-        path: '/tasks/:id/complete',
+        url: '/tasks/:id/complete',
         consume: contentType.JSON,
         produce: contentType.JSON,
         handler: taskService.concludeTask
