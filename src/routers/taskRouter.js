@@ -1,7 +1,7 @@
+import * as taskService from "../services/taskService.js";
 import contentType from "../utils/contentType.js";
 import httpMethod from "../utils/httpMethod.js";
 import httpStatus from "../utils/httpStatus.js";
-import * as taskService from "./services/taskService.js";
 
 const routes = [
     {
@@ -13,14 +13,15 @@ const routes = [
         handler: taskService.getTasks
     },
     {
-        statusReturned: httpStatus.CREATED,
+        statusReturned: httpStatus.NO_CONTENT,
         method: httpMethod.POST,
         url: '/tasks',
+        consume: contentType.JSON,
         produce: contentType.JSON,
         handler: taskService.createTask
     },
     {
-        statusReturned: httpStatus.SUCEESS,
+        statusReturned: httpStatus.NO_CONTENT,
         method: httpMethod.PUT,
         url: '/tasks/:id',
         consume: contentType.JSON,
@@ -31,11 +32,12 @@ const routes = [
         statusReturned: httpStatus.NO_CONTENT,
         method: httpMethod.DELETE,
         url: '/tasks/:id',
+        consume: contentType.JSON,
         produce: contentType.JSON,
         handler: taskService.deleteTask
     },
     {
-        statusReturned: httpStatus.SUCEESS,
+        statusReturned: httpStatus.NO_CONTENT,
         method: httpMethod.PACTH,
         url: '/tasks/:id/complete',
         consume: contentType.JSON,

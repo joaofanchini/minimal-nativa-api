@@ -1,8 +1,9 @@
 import http from 'node:http';
 import taskRouter from './routers/taskRouter.js';
 import ContentType from './utils/contentType.js';
-const PORT = 8080;
+
 const REGEX_PATH_PARAMS = /:(\w)+/g;
+const PORT = 8080;
 
 
 const matchUrl = (routerUrl, reqUrl) => {
@@ -48,6 +49,28 @@ const fillPathParameters = (req, routerUrl) => {
     req.params = { ...params };
 }
 
+const getBody = (req) => {
+    return new Promise((resolve, reject) => {
+        let corpoDaSolicitacao = '';
+
+        req.on('data', (chunk) => {
+            corpoDaSolicitacao += chunk.toString();
+        });
+
+        req.on('end', () => {
+            resolve(corpoDaSolicitacao);
+        });
+
+        req.on('error', (error) => {
+            reject(error);
+        });
+    });
+}
+
+const fillBodyParameter = async (req) => {
+    const body = await getBody(req);
+    req['body'] = JSON.parse(body);
+}
 const server = http.createServer(async (req, res) => {
     const method = req.method;
     const contentType = req.headers['content-type'];
@@ -70,11 +93,11 @@ const server = http.createServer(async (req, res) => {
     }
 
     fillPathParameters(req, router.url)
+    await fillBodyParameter(req);
 
     return res.writeHead(router.statusReturned, {
         'Content-Type': router.produce
-    })
-        .end(JSON.stringify(router.handler(req, res)));
+    }).end(JSON.stringify(router.handler(req, res)));
 });
 
 server.listen(PORT, () =>
