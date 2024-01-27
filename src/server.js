@@ -1,9 +1,8 @@
 import http from 'node:http';
 import taskRouter from './routers/taskRouter.js';
 
-const port = 8080;
-
-const regexPathParamters = /:(\w)+/g;
+const PORT = 8080;
+const REGEX_PATH_PARAMS = /:(\w)+/g;
 
 
 const matchUrl = (routerUrl, reqUrl) => {
@@ -21,7 +20,7 @@ const matchUrl = (routerUrl, reqUrl) => {
 
     for (let i = 0; i < routerSplit.length; i++) {
         const chunckRouter = routerSplit[i];
-        if (regexPathParamters.test(chunckRouter)) {
+        if (REGEX_PATH_PARAMS.test(chunckRouter)) {
             continue;
         }
         const chunckReq = reqSplit[i];
@@ -55,6 +54,6 @@ const server = http.createServer((req, res) => {
         .end(JSON.stringify(router.handler(req, res)));
 });
 
-server.listen(port, () =>
-    console.log(`Server up in port ${port}`)
+server.listen(PORT, () =>
+    console.log(`Server is up on port ${PORT}`)
 );
