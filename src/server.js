@@ -1,6 +1,6 @@
 import http from 'node:http';
 import taskRouter from './routers/taskRouter.js';
-
+import ContentType from './utils/contentType.js';
 const PORT = 8080;
 const REGEX_PATH_PARAMS = /:(\w)+/g;
 
@@ -9,7 +9,6 @@ const matchUrl = (routerUrl, reqUrl) => {
     if (routerUrl.indexOf(':') < 0) {
         return routerUrl === reqUrl;
     }
-
 
     const routerSplit = routerUrl.split('/');
     const reqSplit = reqUrl.split('/');
@@ -33,13 +32,31 @@ const matchUrl = (routerUrl, reqUrl) => {
     return true;
 }
 
-const server = http.createServer((req, res) => {
+const fillPathParameters = (req, routerUrl) => {
+    const params = {};
+
+    const routerSplit = routerUrl.split('/');
+    const reqSplit = req.url.split('/');
+
+    for (let i = 0; i < routerSplit.length; i++) {
+        const chunckRouter = routerSplit[i];
+        if (!REGEX_PATH_PARAMS.test(chunckRouter)) {
+            continue;
+        }
+        params[chunckRouter.replace(':', '')] = reqSplit[i]
+    }
+    req.params = { ...params };
+}
+
+const server = http.createServer(async (req, res) => {
     const method = req.method;
     const contentType = req.headers['content-type'];
     const url = req.url;
 
     if (!contentType) {
-        return res.writeHead(415).end();
+        return res.writeHead(415, {
+            'Content-Type': ContentType.JSON
+        }).end(JSON.stringify({ message: 'Invalid Content-Type' }));
     }
 
     const router = taskRouter.find(router => router.method === method &&
@@ -47,10 +64,16 @@ const server = http.createServer((req, res) => {
         matchUrl(router.url, url));
 
     if (!router) {
-        return res.writeHead(404).end();
+        return res.writeHead(404, {
+            'Content-Type': ContentType.JSON
+        }).end(JSON.stringify({ message: 'Not found' }));
     }
 
-    return res.writeHead(200, 'Sucesso')
+    fillPathParameters(req, router.url)
+
+    return res.writeHead(router.statusReturned, {
+        'Content-Type': router.produce
+    })
         .end(JSON.stringify(router.handler(req, res)));
 });
 

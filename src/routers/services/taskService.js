@@ -14,7 +14,7 @@ export const createtask = (req, res) => {
 }
 
 export const updateTask = (req, res) => {
-    return [];
+    return req.params;
 }
 
 export const deleteTask = (req, res) => {
